@@ -1,0 +1,9 @@
+D:\study\ao\MortonCode\MortonCode\bin\Debug\MortonCode.exe
+D:\study\ao\MortonCode\MortonCode\bin\Debug\MortonCode.pdb
+D:\study\ao\MortonCode\MortonCode\obj\x86\Debug\MortonCode.csprojResolveAssemblyReference.cache
+D:\study\ao\MortonCode\MortonCode\obj\x86\Debug\MortonCode.Form1.resources
+D:\study\ao\MortonCode\MortonCode\obj\x86\Debug\MortonCode.Properties.Resources.resources
+D:\study\ao\MortonCode\MortonCode\obj\x86\Debug\MortonCode.csproj.GenerateResource.Cache
+D:\study\ao\MortonCode\MortonCode\obj\x86\Debug\MortonCode.exe
+D:\study\ao\MortonCode\MortonCode\obj\x86\Debug\MortonCode.pdb
+D:\study\ao\MortonCode\MortonCode\obj\x86\Debug\MortonCode.FormCoastLine.resources
