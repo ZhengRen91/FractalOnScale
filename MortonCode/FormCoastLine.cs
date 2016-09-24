@@ -380,8 +380,13 @@ namespace MortonCode
             }
             else 
             {
-                initialCenterPoints.Add(firstPointColl.get_Point(0));
-                initialCenterPoints.Add(firstPointColl.get_Point(1));
+                IPoint pt1 = firstPointColl.get_Point(0) as IPoint;
+                IPoint pt2 = firstPointColl.get_Point(1) as IPoint;
+                List<IPoint> ptlist = new List<IPoint>();
+                ptlist.Add(pt1);
+                ptlist.Add(pt2);
+                initialCenterPoints = ptlist;
+               
             }
             //确定第二个圆心位置
             if (initialCenterPoints.Count == 2)
@@ -573,82 +578,120 @@ namespace MortonCode
                 MessageBox.Show("Initialize first!");
                 return;
             }
+            //add startvertice
+            pGeometryCollection.AddGeometry(startCenterPoint);
+            //add 2nd
+            pGeometryCollection.AddGeometry(secondCenterPoint);
             //3rd
             tempCenterPoint = CreateNewCenterPoint(secondCenterPoint,startCenterPoint);
-
+            pGeometryCollection.AddGeometry(tempCenterPoint);
             //4th
             lastCenterPoint = secondCenterPoint;
             presentCenterPoint = tempCenterPoint;
             tempCenterPoint = CreateNewCenterPoint(presentCenterPoint, lastCenterPoint);
-            //5th
-            lastCenterPoint = presentCenterPoint;
-            presentCenterPoint = tempCenterPoint;
-            tempCenterPoint = CreateNewCenterPoint(presentCenterPoint, lastCenterPoint);
-            //6th
-            lastCenterPoint = presentCenterPoint;
-            presentCenterPoint = tempCenterPoint;
-            tempCenterPoint = CreateNewCenterPoint(presentCenterPoint, lastCenterPoint);
-            //7th
-            lastCenterPoint = presentCenterPoint;
-            presentCenterPoint = tempCenterPoint;
-            tempCenterPoint = CreateNewCenterPoint(presentCenterPoint, lastCenterPoint);
-            //8th
-            lastCenterPoint = presentCenterPoint;
-            presentCenterPoint = tempCenterPoint;
-            tempCenterPoint = CreateNewCenterPoint(presentCenterPoint, lastCenterPoint);
-
-            //9th
-            lastCenterPoint = presentCenterPoint;
-            presentCenterPoint = tempCenterPoint;
-            tempCenterPoint = CreateNewCenterPoint(presentCenterPoint, lastCenterPoint);
-
-            //10th
-            lastCenterPoint = presentCenterPoint;
-            presentCenterPoint = tempCenterPoint;
-            tempCenterPoint = CreateNewCenterPoint(presentCenterPoint, lastCenterPoint);
-
-            
             pGeometryCollection.AddGeometry(tempCenterPoint);
-            CreateShpfile("10thPoint", pGeometryCollection);
+            ////5th
+            //lastCenterPoint = presentCenterPoint;
+            //presentCenterPoint = tempCenterPoint;
+            //tempCenterPoint = CreateNewCenterPoint(presentCenterPoint, lastCenterPoint);
 
-            //presentCircle = CreateCircleArc(tempCenterPoint, radius, false);
-            //IPointCollection interColl = IntersectPointColl(presentCircle, this.Coastline);
-            //List<IPoint> interList = new List<IPoint>();
-            //for (int i = 0; i < interColl.PointCount; i++)
-            //{
-            //    interList.Add(interColl.get_Point(i));
-            //}
-            //initialCoastLine();
-            //IEnumVertex pEnumVertex = interColl.EnumVertices;
-            //IPolycurve2 pPolyCurve = this.Coastline as IPolycurve2;
-            //pPolyCurve.SplitAtPoints(pEnumVertex, false, true, -1);
-            //IGeometryCollection geoColl = pPolyCurve as IGeometryCollection;
-            //MessageBox.Show(geoColl.GeometryCount.ToString());
-            //List<IPoint> ptlist = new List<IPoint>();
-            //// The results are pathclass
-            //IPath resultPath;
-            //for (int i = 0; i < geoColl.GeometryCount; i++)
-            //{
-            //    object obj = Type.Missing;
-            //    resultPath = new PathClass();
-            //    resultPath = (IPath)geoColl.get_Geometry(i);
-            //    IGeometryCollection lineColl = new PolylineClass();
-            //    lineColl.AddGeometry(resultPath, ref obj, ref obj);
-            //    IPolyline line = (IPolyline)lineColl;
-            //    pGeometryCollection.AddGeometry(line);
-            //    IRelationalOperator pRelOperator = (IRelationalOperator)line;
-            //    if (pRelOperator.Touches(tempCenterPoint))
-            //    {
-            //        IPoint temPT1 = resultPath.FromPoint;
-            //        IPoint temPT2 = resultPath.ToPoint;
-            //        //pGeometryCollection.AddGeometry(temPT1);
-            //        //pGeometryCollection.AddGeometry(temPT2);
-            //        ptlist.Add(temPT1);
-            //        ptlist.Add(temPT2);
-            //    }
-            //}
-            //CreateShpfile("Path9", pGeometryCollection);
+            if (startCirclePolygon == null)
+            {
+                MessageBox.Show("Initialize the startCirclePolygon");
+                return;
+            }
+            IRelationalOperator relCircle = startCirclePolygon as IRelationalOperator;
+            while (!relCircle.Contains(tempCenterPoint))
+            {
+                lastCenterPoint = presentCenterPoint;
+                presentCenterPoint = tempCenterPoint;
+                tempCenterPoint = CreateNewCenterPoint(presentCenterPoint, lastCenterPoint);
+                pGeometryCollection.AddGeometry(tempCenterPoint);
+            }
+            if (MessageBox.Show("Create vertices shapefile?", "Note", MessageBoxButtons.YesNo) == DialogResult.Yes) 
+            {
+                CreateShpfile("YardstickVertices", pGeometryCollection);
+            }         
 
+            /*...Test Paths...
+            presentCircle = CreateCircleArc(tempCenterPoint, radius, false);
+            IPointCollection interColl = IntersectPointColl(presentCircle, this.Coastline);
+            List<IPoint> interList = new List<IPoint>();
+            for (int i = 0; i < interColl.PointCount; i++)
+            {
+                interList.Add(interColl.get_Point(i));
+            }
+            initialCoastLine();
+            IEnumVertex pEnumVertex = interColl.EnumVertices;
+            IPolycurve2 pPolyCurve = this.Coastline as IPolycurve2;
+            pPolyCurve.SplitAtPoints(pEnumVertex, false, true, -1);
+            IGeometryCollection geoColl = pPolyCurve as IGeometryCollection;
+            MessageBox.Show(geoColl.GeometryCount.ToString());
+            List<IPoint> ptlist = new List<IPoint>();
+            // The results are pathclass
+            IPath resultPath;
+            for (int i = 0; i < geoColl.GeometryCount; i++)
+            {
+                object obj = Type.Missing;
+                resultPath = new PathClass();
+                resultPath = (IPath)geoColl.get_Geometry(i);
+                IGeometryCollection lineColl = new PolylineClass();
+                lineColl.AddGeometry(resultPath, ref obj, ref obj);
+                IPolyline line = (IPolyline)lineColl;
+                pGeometryCollection.AddGeometry(line);
+                IRelationalOperator pRelOperator = (IRelationalOperator)line;
+                if (pRelOperator.Touches(tempCenterPoint))
+                {
+                    IPoint temPT1 = resultPath.FromPoint;
+                    IPoint temPT2 = resultPath.ToPoint;
+                    //pGeometryCollection.AddGeometry(temPT1);
+                    //pGeometryCollection.AddGeometry(temPT2);
+                    ptlist.Add(temPT1);
+                    ptlist.Add(temPT2);
+                }
+            }
+            CreateShpfile("Path9", pGeometryCollection);
+            */
+
+            //...Create yardstick using the generated vertices...
+            if (MessageBox.Show("Finish generating vertices, create yardsticks?", "Note", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                pGeometryCollection = GenerateYardSticks(pGeometryCollection);
+                CreateShpfile("Yardsticks", pGeometryCollection);
+            }
+            else 
+            {
+                return;
+            }
+            
+        }
+
+        private IGeometryCollection GenerateYardSticks(IGeometryCollection verticesColl) 
+        {
+            IPoint startPT=new PointClass();
+            IPoint endPT = new PointClass();
+            IGeometryCollection yardstickColl=new GeometryBagClass();
+            ISegmentCollection yardsegColl = new PolylineClass();            
+            object obj = Type.Missing;
+            for (int i = 0; i < verticesColl.GeometryCount; i++) 
+            {
+                if (i < verticesColl.GeometryCount - 1)
+                {
+                    ILine pLine = new LineClass();
+                    
+                    startPT = verticesColl.get_Geometry(i) as IPoint;
+                    endPT = verticesColl.get_Geometry(i + 1) as IPoint;
+                    pLine.PutCoords(startPT, endPT);
+                    yardsegColl.AddSegment(pLine as ISegment, ref obj, ref obj);                                   
+                }
+                else 
+                {
+                    MessageBox.Show(i+" yardsticks generated");
+                }
+            }
+            IPolyline pPolyline = (IPolyline)yardsegColl; 
+            yardstickColl.AddGeometry(pPolyline, ref obj, ref obj);
+            return yardstickColl;
         }
 
         private IPoint CreateNewCenterPoint(IPoint presentCP, IPoint lastCP) 
